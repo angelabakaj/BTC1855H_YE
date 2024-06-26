@@ -9,6 +9,21 @@
 #' @param filepath
 #' @output Vector containing words from the file
 get_words <- function (filepath){
-  words <- read.table(file = filepath, header = F, strip.white = T, col.names = "Words")
-  return(words)
+  # Read the specified file and save it as words
+  masterlist <- read.table(file = filepath, header = F, strip.white = T, col.names = "Words")
+  
+  #convert to a vector
+  wordsvec <- masterlist$Words
+  
+  # Return the words object
+  return(wordsvec)
 }
+
+
+
+#Read words from file, store as a vector
+#TO DO: Create a function which takes a difficulty and then filters a word
+wordbank <- get_words("words.txt")
+
+#sample the word
+word <- sample(wordbank,1)
