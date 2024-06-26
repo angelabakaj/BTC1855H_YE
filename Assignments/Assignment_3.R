@@ -19,10 +19,13 @@ get_words <- function (filepath){
   return(wordsvec)
 }
 
+#TO DO: Create function that error handles user input
+# Include parameter for word or number
+
 
 
 #Read words from file, store as a vector
-#TO DO: Create a function which takes a difficulty and then filters a word
+#TO DO: Create a function which takes a difficulty and then filters the wordbank before selecting
 wordbank <- get_words("words.txt")
 
 #sample the word
