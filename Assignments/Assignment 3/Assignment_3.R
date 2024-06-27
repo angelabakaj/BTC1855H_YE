@@ -54,9 +54,15 @@ take_guess <- function (){
       
       #check for any special characters
     } else if (grepl("[[:punct:]]", input)){
+      
       cat("Special characters are not allowed: ")
       
       #if all the checks are passed take the guess
+    } else if (input == "quit game"){
+      
+      guess_type <- "quit"
+      break
+      
     } else{
       
       #check if the user entered a single letter
@@ -105,7 +111,7 @@ secretwordvec <- unlist(strsplit(secretword, split = ""))
 
 #Inform the user of the length of the word, and number of guesses
 cat("The secret word is", word_len, "letters long. You have", num_guesses, "tries to guess the word!\n")
-
+cat("Type: \"quit game\" at any time to exit the game\n")
 
 #Create a vector the same size as the word with "_"s to represent missing letters
 # We are going to replace the "_"s with the letters they guess correctly
@@ -162,7 +168,7 @@ for (i in 1:num_guesses){
       guesses <- c(guesses, guess)
     }
     # if there are changes it means the letter was in the secret word
-    else{
+    else {
       cat(guess, " is in the word!\n\n")
     }
     
@@ -175,7 +181,7 @@ for (i in 1:num_guesses){
     }
     
     #if they guess a word then see if it matches
-  } else{
+  } else if (guess[1] == "word"){
     #extract the guess from the returned vector
     guess <- guess[2]
     
@@ -193,6 +199,12 @@ for (i in 1:num_guesses){
       
       cat("Wrong guess, try again!\n\n")
     }
+    
+    #if the user quits
+  } else {
+    
+    #break the loop
+    break
   }
 }
 
@@ -204,6 +216,7 @@ if (win == TRUE) {
   cat("The word was:", secretword, "\n")
   
 } else {
-    cat("OH NO!, you lost!\n")
+    cat("Game over!\n")
     cat("The word was:", secretword, "\n")
 }
+
