@@ -30,33 +30,58 @@ take_guess <- function (){
   #Create a flag that will tell us what kind of guess the user returns
   guess_type <- NULL
   
+  #string of characters that are not allowed | indicates OR
+  not_allowed <- 
+  
   # Keep taking inputs until one is satisfactory
   repeat{
     #take an input
-    input <- readline("Please guess a letter, or guess the entire word: ")
-    nchar(input)
+    #convert to lowercase since the word bank is all lowercase
+    input <- tolower(readline("Please guess a letter, or guess the entire word: "))
+    
+    # note: the [some character notation] is called a regular expression (regex)
+    # [0-9] means any string with any digit 0-9 in it
+    # [[:punct:]] means any string with punctuation/special characters
+    #the grepl function checks for any whatever pattern you choose in the input
     
     #check that it is not a number
-    # suppress the warnings since we are dealing with them
-    if (suppressWarnings(!is.na(as.numeric(input)))){
-      cat("Please guess a letter or the entire word: ")
+    if (grepl("[0-9]", input)){
+      cat("Numbers are not allowed: ")
       
       # Check that the user inputted something at all
-    } else if (is.na(input)){
+    } else if (input == ""){
       cat("Please guess a letter or the entire word: ")
       
+      #check for any special characters
+    } else if (grepl("[[:punct:]]", input)){
+      cat("Special characters are not allowed: ")
+      
+      #if all the checks are passed take the guess
+    } else{
+      
       #check if the user entered a single letter
-
-    } else if (nchar(input) == 1){
-      guess_type <- "single"
-      break
+      if (nchar(input) == 1){
+        
+        #set the guess type to single
+        guess_type <- "single"
+        
+        #break the loop to allow the function to return values
+        break
+        
+        
+        #check if the input is a whole word
+        #we will assume that if the length is greater than 1, they are guessing a word
+      } else{
+          #set guess type to entire word
+          guess_type <- "word"
+          
+          #break the loop to allow the function to return values
+          break
+      }
       
       #check if the input is a whole word
       #we will assume that if the length is greater than 1, they are guessing a word 
-    } else if (nchar(input) > 1){
-      guess_type <- "word"
-      break
-    }
+    } 
   }
   # return a vector where the first element is the type of guess
   # second element is the guess itself
@@ -182,5 +207,3 @@ if (win == TRUE) {
     cat("OH NO!, you lost!\n")
     cat("The word was:", secretword, "\n")
 }
-
-
