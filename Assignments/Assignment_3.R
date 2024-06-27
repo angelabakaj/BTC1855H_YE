@@ -20,6 +20,49 @@ get_words <- function (filepath){
   return(wordsvec)
 }
 
+# Defining a function which takes a guess from the user
+#' @name take_guess
+#' @param none
+#' @output returns the guess and whether the user guessed a letter or a whole word
+take_guess <- function (){
+  
+  
+  #Create a flag that will tell us what kind of guess the user returns
+  guess_type <- NULL
+  
+  # Keep taking inputs until one is satisfactory
+  repeat{
+    #take an input
+    input <- readline("Please guess a letter, or guess the entire word: ")
+    nchar(input)
+    
+    #check that it is not a number
+    # suppress the warnings since we are dealing with them
+    if (suppressWarnings(!is.na(as.numeric(input)))){
+      cat("Please guess a letter or the entire word: ")
+      
+      # Check that the user inputted something at all
+    } else if (is.na(input)){
+      cat("Please guess a letter or the entire word: ")
+      
+      #check if the user entered a single letter
+
+    } else if (nchar(input) == 1){
+      guess_type <- "single"
+      break
+      
+      #check if the input is a whole word
+      #we will assume that if the length is greater than 1, they are guessing a word 
+    } else if (nchar(input) > 1){
+      guess_type <- "word"
+      break
+    }
+  }
+  # return a vector where the first element is the type of guess
+  # second element is the guess itself
+  return(c(guess_type, input))
+}
+
 
 #Read words from file, store as a vector
 wordbank <- get_words("words.txt")
@@ -31,6 +74,9 @@ secretword <- sample(wordbank,1)
 # RULE: User gets n+1 guesses for a word of length n, with a minimum of 5 guesses
 word_len <- nchar(secretword)
 num_guesses <- word_len + 1
+
+#turn the secret word into a vector so it's easier to work with later
+secretwordvec <- unlist(strsplit(secretword, split = ""))
 
 #Inform the user of the length of the word, and number of guesses
 cat("The secret word is", word_len, "letters long. You have", num_guesses, "tries to guess the word!\n")
@@ -45,15 +91,96 @@ for (i in progress){
   progress[i] <- "_"
 }
 
-for (i in num_guesses){
+#create a bank to hold all the guesses
+guesses <- vector()
+
+#Set a variable to determine win status
+win <- FALSE
+
+for (i in 1:num_guesses){
   # Show progress
-  cat(progress)
+  cat(progress, " | ", "Guesses remaining: ", num_guesses, "\n")
+  cat("Previous guesses", guesses, "\n\n")
   
-  #Take a guess from the user
+  #Take a guess from the user, and identify what kind of guess it is
+  guess <- take_guess()
+  
+  #reduce their num guesses by 1
+  num_guesses <- num_guesses-1
   
   #determine if the guess is correct
   
-  #Exit if correct
+  #if they guess a single letter, see if it matches any in the secret word
+  if (guess[1] == "single"){
+    
+    #extract the guess from the returned vector
+    guess <- guess[2]
+    
+    #create a temporary version of progress to check against after
+    previous_prog <- progress
+    
+    #check the guess against all the letters in the secret word
+    for (i in 1:word_len){
+      if (guess == secretwordvec[i]){
+        
+        #update the user's progress
+        progress[i] <- guess
+      }
+    }
+    
+    #Check if none of the letters changed
+    if (all(previous_prog == progress)){
+      
+      cat(guess, " is not in the word!\n\n")
+      
+      #add the guess to the list of letters already guessed
+      guesses <- c(guesses, guess)
+    }
+    # if there are changes it means the letter was in the secret word
+    else{
+      cat(guess, " is in the word!\n\n")
+    }
+    
+    #check win condition
+    if (all(progress == secretwordvec)){
+      win <- TRUE
+
+      #stop the loop if they guessed correctly
+      break
+    }
+    
+    #if they guess a word then see if it matches
+  } else{
+    #extract the guess from the returned vector
+    guess <- guess[2]
+    
+    #check if the guess matches the secret word
+    if (guess == secretword){
+
+      # Change state to win
+      win <- TRUE
+
+      #stop the loop
+      break
+      # if the guess isn't right then print an appropriate message
+      
+    } else{
+      
+      cat("Wrong guess, try again!\n\n")
+    }
+  }
+}
+
+#Determine if the user won or lost
+if (win == TRUE) {
+  
+  #print an appropriate message
+  cat("CONGRATUALTIONS, you win!\n")
+  cat("The word was:", secretword, "\n")
+  
+} else {
+    cat("OH NO!, you lost!\n")
+    cat("The word was:", secretword, "\n")
 }
 
 
