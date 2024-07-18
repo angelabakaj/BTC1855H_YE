@@ -4,6 +4,7 @@
 
 
 
+
 # Defining a function which reads words from a .txt into a vector
 # The words used in my file were taken from: https://github.com/Xethron/Hangman/blob/master/words.txt
 #' @name get_words
@@ -39,7 +40,7 @@ take_guess <- function (){
     #convert to lowercase since the word bank is all lowercase
     input <- tolower(readline("Please guess a letter, or guess the entire word: "))
     
-    # note: the [some character notation] is called a regular expression (regex)
+    # note: the [some character] notation is called a regular expression (regex)
     # [0-9] means any string with any digit 0-9 in it
     # [[:punct:]] means any string with punctuation/special characters
     #the grepl function checks for any whatever pattern you choose in the input
@@ -104,7 +105,13 @@ secretword <- sample(wordbank,1)
 #set number of guesses and inform the user how many guesses
 # RULE: User gets n+1 guesses for a word of length n, with a minimum of 5 guesses
 word_len <- nchar(secretword)
-num_guesses <- word_len + 1
+
+if (word_len <= 5){
+  num_guesses <- 5
+} else {
+  num_guesses <- word_len + 1
+}
+
 
 #turn the secret word into a vector so it's easier to work with later
 secretwordvec <- unlist(strsplit(secretword, split = ""))
@@ -114,37 +121,41 @@ cat("The secret word is", word_len, "letters long. You have", num_guesses, "trie
 cat("Type: \"quit game\" at any time to exit the game\n")
 
 #Create a vector the same size as the word with "_"s to represent missing letters
-# We are going to replace the "_"s with the letters they guess correctly
-
+# We are going slowly to replace the "_"s with the letters they guess correctly
 progress <- 1:word_len
 
+# populating the vector with "_"s
 for (i in progress){
   progress[i] <- "_"
 }
 
-#create a bank to hold all the guesses
+#create a bank to hold all the previous guesses
 guesses <- vector()
 
-#Set a variable to determine win status
+#Create a variable to determine win status
+# We will check this later to determine if the user has won the game or not
 win <- FALSE
 
+# this is the main game loop
+# We are going to repeat as many times as they have guesses, and potentially break out earlier
 for (i in 1:num_guesses){
-  # Show progress
+  
+  # Show their progress
   cat(progress, " | ", "Guesses remaining: ", num_guesses, "\n")
-  cat("Previous guesses", guesses, "\n\n")
+  cat("Previous guesses:", guesses, "\n\n")
   
   #Take a guess from the user, and identify what kind of guess it is
+  # Here the guess variable will be a character vector containing [The type of guess (word/just a letter), the actual guess (the input)]
   guess <- take_guess()
   
-  #reduce their num guesses by 1
+  #reduce their number of guesses by 1
   num_guesses <- num_guesses-1
   
   #determine if the guess is correct
-  
   #if they guess a single letter, see if it matches any in the secret word
   if (guess[1] == "single"){
     
-    #extract the guess from the returned vector
+    #extract the input from the returned vector
     guess <- guess[2]
     
     #create a temporary version of progress to check against after
@@ -153,6 +164,7 @@ for (i in 1:num_guesses){
     #check the guess against all the letters in the secret word
     for (i in 1:word_len){
       if (guess == secretwordvec[i]){
+        progress[guess == secretword]
         
         #update the user's progress
         progress[i] <- guess
