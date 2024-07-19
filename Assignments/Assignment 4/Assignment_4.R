@@ -45,7 +45,6 @@ martians_complete <- martians_complete %>%
 #Removing hoax
 #since NUFORC comment on potential hoax citings, the word NUFORC should appear in the comments
 #We will filter out the rows where NUFORC appears in the comments
-
 no_hoax <- martians_complete %>%
   filter(!str_detect(pattern = "NUFORC", comments))
 
@@ -85,6 +84,7 @@ delay %>% group_by(country) %>%
 
 
 #histogram of delays
+#log the seconds 
 hist(log(delay$duration.seconds),
      main = "Duration of UFO Sightings",
      xlab = "Log of Duration of sighting"
